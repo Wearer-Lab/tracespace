@@ -142,5 +142,8 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2",
     "worker-loader": "^2.0.0"
+  },
+  "dependencies": {
+    "ntl": "^5.1.0"
   }
 }
