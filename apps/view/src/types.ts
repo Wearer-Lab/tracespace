@@ -120,16 +120,3 @@ export type Logger = {[Level in LogLevel]: LogHandler}
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 export type Optional<T> = {[P in keyof T]?: T[P] | null | undefined}
-
-export type Comment = {
-  id: string
-  boardId: string
-  x: number
-  y: number
-  text: string
-  mode: Exclude<Mode, null>
-  addedAt: number
-  author: string
-}
-
-export type CommentWithOutId = Omit<Comment, 'id'>

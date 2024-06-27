@@ -39,28 +39,3 @@ export function useLocation(): Location | null {
 
   return locationRef.current
 }
-
-export function useElementListener<Event extends keyof HTMLElementEventMap>(
-  element: HTMLElement | string | null,
-  event: Event,
-  handler: (event: HTMLElementEventMap[Event]) => unknown
-): void {
-  useEffect(() => {
-    let el: HTMLElement | null = null
-
-    if (!element) {
-      return () => {
-        console.log('no element')
-      }
-    } else if (typeof element === 'string') {
-      el = document.querySelector(element)
-    } else {
-      el = element
-    }
-
-    if (el) {
-      el.addEventListener(event, handler)
-      return () => el.removeEventListener(event, handler)
-    }
-  }, [element, event, handler])
-}

@@ -68,7 +68,6 @@ export default function reducer(state: State, action: Action): State {
     }
 
     case actionTypes.BOARD_RENDERED: {
-      console.log('BOARD_RENDERED', action.payload)
       const {mode, layerVisibility: prevLayerVisibility} = state
       const board = action.payload
       const layerVisibility = board.layers.reduce((result, ly) => {
@@ -87,22 +86,6 @@ export default function reducer(state: State, action: Action): State {
         loading: false,
         updating: false,
       }
-    }
-
-    case actionTypes.COMMENT_RENDERED: {
-      console.log('COMMENT_RENDERED', action.payload)
-      return {
-        ...state,
-        comments: action.payload.comments,
-      }
-    }
-
-    case actionTypes.COMMENT_SHOW: {
-      return {...state, commentToShow: action.payload}
-    }
-
-    case actionTypes.COMMENT_HIDE: {
-      return {...state, commentToShow: null}
     }
 
     case actionTypes.BOARD_UPDATED: {

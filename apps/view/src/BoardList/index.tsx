@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 
-import {useAppState, getBoard, getComment} from '../state'
+import {useAppState, getBoard} from '../state'
 import {usePrevious} from '../hooks'
 import {Fade, Slide} from '../ui'
 import ShowButton from './ShowButton'
@@ -33,7 +33,6 @@ export default function BoardList(): JSX.Element {
           boards={savedBoards}
           onItemClick={(id: string) => {
             dispatch(getBoard(id))
-            dispatch(getComment(id))
             setSelected(id)
           }}
         />

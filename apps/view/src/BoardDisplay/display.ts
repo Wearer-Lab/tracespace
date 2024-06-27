@@ -12,7 +12,6 @@ export const INITIAL_STATE: DisplayState = {
   x: 0,
   y: 0,
   step: SCALE_STEP_COUNT / 2,
-  scaleRatio: 1,
 }
 
 const SCALE_MIN_LOG = Math.log(SCALE_MIN)
@@ -29,8 +28,8 @@ export const SCALE_STEPS = new Array(SCALE_STEP_COUNT + 1)
 export function zoom(
   prevState: DisplayState,
   delta: number,
-  centerX = 0.5,
-  centerY = 0.5
+  centerX: number = 0.5,
+  centerY: number = 0.5
 ): DisplayState {
   const {x: prevX, y: prevY, step: prevStep} = prevState
   const {scale: prevScale} = getScale(prevStep)
@@ -41,7 +40,6 @@ export function zoom(
     step: nextStep,
     x: prevX + (scaleRatio - 1) * (prevX - centerX + 0.5),
     y: prevY + (scaleRatio - 1) * (prevY - centerY + 0.5),
-    scaleRatio,
   }
 }
 

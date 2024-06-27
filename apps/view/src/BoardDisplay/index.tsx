@@ -9,7 +9,6 @@ import PanZoom from './PanZoom'
 import Controls from './Controls'
 import LayersRender from './LayersRender'
 import {DisplayControllerProps} from './types'
-import CommentList from '../Comment'
 
 const percent = (n: number): string => `${n * 100}%`
 const getId = (b: {id: string} | null): string | null => (b ? b.id : null)
@@ -23,7 +22,6 @@ export default function BoardDisplay(): JSX.Element {
 
   const controllerProps: DisplayControllerProps = {
     step: displayState.step,
-    scaleRatio: displayState.scaleRatio,
     reset: () => setDisplayState(INITIAL_STATE),
     pan: (...args) => setDisplayState(pan(displayState, ...args)),
     zoom: (...args) => setDisplayState(zoom(displayState, ...args)),
@@ -48,29 +46,26 @@ export default function BoardDisplay(): JSX.Element {
   return (
     <>
       <Fade in={show}>
-        <>
-          {board && <CommentList />}
-          <PanZoom {...controllerProps} containerRef={containerRef}>
-            {board && (
-              <>
-                <SvgRender
-                  className={cx('w-100', {dn: mode !== 'top'})}
-                  source={board.top}
-                />
-                <SvgRender
-                  className={cx('w-100', {dn: mode !== 'bottom'})}
-                  source={board.bottom}
-                />
-                <LayersRender
-                  className={cx('w-100', {clip: mode !== 'layers'})}
-                  viewBox={board.viewBox}
-                  layers={board.layers}
-                  layerVisibility={layerVisibility}
-                />
-              </>
-            )}
-          </PanZoom>
-        </>
+        <PanZoom {...controllerProps} containerRef={containerRef}>
+          {board && (
+            <>
+              <SvgRender
+                className={cx('w-100', {dn: mode !== 'top'})}
+                source={board.top}
+              />
+              <SvgRender
+                className={cx('w-100', {dn: mode !== 'bottom'})}
+                source={board.bottom}
+              />
+              <LayersRender
+                className={cx('w-100', {clip: mode !== 'layers'})}
+                viewBox={board.viewBox}
+                layers={board.layers}
+                layerVisibility={layerVisibility}
+              />
+            </>
+          )}
+        </PanZoom>
       </Fade>
       <Slide in={show} from="bottom">
         <Controls {...controllerProps} />

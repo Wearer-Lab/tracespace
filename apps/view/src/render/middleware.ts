@@ -20,8 +20,6 @@ export function createRenderMiddleware(): State.Middleware {
         case State.CREATE_BOARD:
         case State.CREATE_BOARD_FROM_URL:
         case State.GET_BOARD:
-        case State.GET_COMMENT:
-        case State.ADD_COMMENT:
         case State.GET_BOARD_PACKAGE:
         case State.UPDATE_BOARD:
         case State.DELETE_BOARD:
