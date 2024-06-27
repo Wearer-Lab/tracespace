@@ -24,6 +24,9 @@ function App(): JSX.Element {
 
     if (files.length > 0) dispatch(createBoard(files, 'dataTransfer' in event))
     if ('value' in event.target) event.target.value = ''
+
+    console.log(event)
+
     preventDefault(event)
   }
 

@@ -4,6 +4,8 @@ import {
   BoardUpdate,
   BoardRender,
   Mode,
+  Comment,
+  CommentWithOutId,
 } from '../types'
 
 import {Action} from './types'
@@ -14,6 +16,8 @@ export const APP_PREFERENCES = 'APP_PREFERENCES'
 export const CREATE_BOARD = 'CREATE_BOARD'
 export const CREATE_BOARD_FROM_URL = 'CREATE_BOARD_FROM_URL'
 export const GET_BOARD = 'GET_BOARD'
+export const GET_COMMENT = 'GET_COMMENT'
+export const ADD_COMMENT = 'ADD_COMMENT'
 export const GET_BOARD_PACKAGE = 'GET_BOARD_PACKAGE'
 export const UPDATE_BOARD = 'UPDATE_BOARD'
 export const DELETE_BOARD = 'DELETE_BOARD'
@@ -21,6 +25,9 @@ export const DELETE_ALL_BOARDS = 'DELETE_ALL_BOARDS'
 export const SET_MODE = 'SET_MODE'
 export const TOGGLE_VISIBILITY = 'TOGGLE_VISIBILITY'
 export const BOARD_RENDERED = 'BOARD_RENDERED'
+export const COMMENT_RENDERED = 'COMMENT_RENDERED'
+export const COMMENT_SHOW = 'COMMENT_SHOW'
+export const COMMENT_HIDE = 'COMMENT_HIDE'
 export const BOARD_UPDATED = 'BOARD_UPDATED'
 export const BOARD_DELETED = 'BOARD_DELETED'
 export const BOARD_PACKAGED = 'BOARD_PACKAGED'
@@ -45,7 +52,7 @@ export const appPreferences = (prefs: AppPreferences): Action => ({
 
 export const createBoard = (
   files: Array<File>,
-  dragAndDrop: boolean = false
+  dragAndDrop = false
 ): Action => ({
   type: CREATE_BOARD,
   payload: files,
@@ -60,6 +67,16 @@ export const createBoardFromUrl = (url: string): Action => ({
 export const getBoard = (id: string): Action => ({
   type: GET_BOARD,
   payload: id,
+})
+
+export const getComment = (id: string): Action => ({
+  type: GET_COMMENT,
+  payload: id,
+})
+
+export const addComment = (comment: CommentWithOutId): Action => ({
+  type: ADD_COMMENT,
+  payload: comment,
 })
 
 export const updateBoard = (id: string, update: BoardUpdate): Action => ({
@@ -95,6 +112,14 @@ export const boardRendered = (render: BoardRender, time: number): Action => ({
   type: BOARD_RENDERED,
   payload: render,
   metadata: {time},
+})
+
+export const commentRendered = (
+  id: string,
+  comments: Array<Comment>
+): Action => ({
+  type: COMMENT_RENDERED,
+  payload: {id, comments},
 })
 
 export const boardUpdated = (board: BoardSummary): Action => ({

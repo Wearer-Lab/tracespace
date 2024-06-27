@@ -50,6 +50,18 @@
   top: 7rem;
 }
 
+.top-8 {
+  top: 8rem;
+}
+
+.top-9 {
+  top: 9rem;
+}
+
+.top-10 {
+  top: 10rem;
+}
+
 .bottom-5 {
   bottom: 5rem;
 }
@@ -99,3 +111,54 @@ input.clip:focus + * {
 .grab:active {
   cursor: grabbing;
 }
+
+.py-1 {
+  padding: 0.5rem;
+}
+
+
+
+.context-menu {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  color: black;
+  max-width: 300px;
+}
+
+.context-menu ul {
+  background-color: white;
+  outline: none;
+  padding: 0.5rem;
+  border-radius: 10px;
+  /* gap: 0.5rem; */
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.context-menu ul li a {
+  padding: 0.5rem;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.context-menu ul li a:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+.comment-box {
+  position: absolute;
+  z-index: 1000;
+  background-color: white;
+  color: black;
+  border-radius: 10px;
+  border-top-left-radius: 0;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  max-width: 300px;
+}
+
+.comment-box p {
+  margin: 0;
+}
+

@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react'
 
-import {useAppState, getBoard, getComment} from '../state'
+import {useAppState, getBoard} from '../state'
 import {usePrevious} from '../hooks'
 import {Fade, Slide} from '../ui'
 import ShowButton from './ShowButton'
-import SavedBoardList from './SavedBoardList'
+import SavedCommentList from './SavedCommentList'
 
-export default function BoardList(): JSX.Element {
-  const {mode, loading, board, savedBoards, dispatch} = useAppState()
-  const [show, setShow] = useState(mode === null)
+export default function CommentList(): JSX.Element {
+  const {mode, loading, board, comments, dispatch} = useAppState()
+  const [show, setShow] = useState(false)
   const [selected, setSelected] = useState(board ? board.id : null)
   const prevLoading = usePrevious(loading)
 
@@ -19,21 +19,23 @@ export default function BoardList(): JSX.Element {
     }
   }, [prevLoading, loading, board])
 
-  const haveBoards = savedBoards.length > 0
-  const showList = haveBoards && show
+  const modeComments = comments.filter(c => c.mode === mode)
+  const haveComments = modeComments.length > 0
+  const showList = haveComments && show
+
+  console.log('CommentList:', comments)
 
   return (
     <>
-      <Fade in={haveBoards}>
+      <Fade in={haveComments}>
         <ShowButton show={showList} toggle={() => setShow(!show)} />
       </Fade>
       <Slide in={showList} from="right">
-        <SavedBoardList
+        <SavedCommentList
           selectedId={selected}
-          boards={savedBoards}
+          comments={modeComments}
           onItemClick={(id: string) => {
             dispatch(getBoard(id))
-            dispatch(getComment(id))
             setSelected(id)
           }}
         />

@@ -2,6 +2,7 @@ export type DisplayState = {
   x: number
   y: number
   step: number
+  scaleRatio: number
 }
 
 export type Point = {
@@ -30,4 +31,5 @@ export type DisplayControllerProps = {
   zoomIn: () => void
   zoomOut: () => void
   reset: () => void
+  scaleRatio: number
 }

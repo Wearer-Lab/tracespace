@@ -13,7 +13,8 @@ export default function FileInput(props: FileInputProps): JSX.Element {
 
   return (
     <label className="db pv4 pointer">
-      <HiddenInput type="file" onChange={handleFiles} multiple />
+      <HiddenInput type="file" onChange={handleFiles} />
+      {/* <HiddenInput type="file" onChange={handleFiles} multiple /> */}
       <Icon name="plus" className="dib f1 brand" />
       {children}
     </label>

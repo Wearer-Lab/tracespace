@@ -6,25 +6,36 @@ import {
   LayerVisibilityMap,
   Mode,
   ErrorObject,
+  Comment,
+  CommentWithOutId,
 } from '../types'
+
+export type CommentToShow = {x: number; y: number; text: string}
 
 export type State = {
   appPreferences: AppPreferences
   board: BoardRender | null
   savedBoards: Array<BoardSummary>
   mode: Mode
+  comments: Array<Comment>
   loading: boolean
   updating: boolean
   downloading: boolean
   layerVisibility: LayerVisibilityMap
   error: null | ErrorObject
+  commentToShow: null | CommentToShow
+  showComment: (comment: CommentToShow) => void
+  hideComment: () => void
 }
 
 export type Reducer = (state: State, action: Action) => State
 
 export type Dispatch = (action: Action) => Action
 
-export type Store = {getState: () => State; dispatch: Dispatch}
+export type Store = {
+  getState: (data?: Partial<State>) => State
+  dispatch: Dispatch
+}
 
 export type Middleware = (store: Store) => (next: Dispatch) => Dispatch
 
@@ -39,6 +50,8 @@ export type Action =
     }
   | {type: 'CREATE_BOARD_FROM_URL'; payload: string}
   | {type: 'GET_BOARD'; payload: string}
+  | {type: 'GET_COMMENT'; payload: string}
+  | {type: 'ADD_COMMENT'; payload: CommentWithOutId}
   | {type: 'UPDATE_BOARD'; payload: {id: string; update: BoardUpdate}}
   | {type: 'DELETE_BOARD'; payload: string}
   | {type: 'DELETE_ALL_BOARDS'}
@@ -46,6 +59,9 @@ export type Action =
   | {type: 'SET_MODE'; payload: Mode}
   | {type: 'TOGGLE_VISIBILITY'; payload: {id: string; solo: boolean}}
   | {type: 'BOARD_RENDERED'; payload: BoardRender; metadata: {time: number}}
+  | {type: 'COMMENT_RENDERED'; payload: {comments: Array<Comment>; id: string}}
+  | {type: 'COMMENT_SHOW'; payload: CommentToShow}
+  | {type: 'COMMENT_HIDE'}
   | {type: 'BOARD_UPDATED'; payload: BoardSummary}
   | {type: 'BOARD_DELETED'; payload: string}
   | {type: 'BOARD_PACKAGED'; payload: {id: string; name: string; file: Blob}}

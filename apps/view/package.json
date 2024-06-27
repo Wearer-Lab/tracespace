@@ -59,6 +59,7 @@
     "mixpanel-browser": "^2.29.1",
     "pcb-stackup": "^4.2.8",
     "pcb-stackup-core": "^4.2.8",
+    "primereact": "^10.6.6",
     "pump": "^3.0.0",
     "randomcolor": "^0.5.4",
     "react": "^16.13.1",
