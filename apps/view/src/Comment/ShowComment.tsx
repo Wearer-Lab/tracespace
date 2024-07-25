@@ -1,34 +1,34 @@
 import React from 'react'
 import {useAppState} from '../state'
-import {useElementListener, useWindowListener} from '../hooks'
+import {useWindowListener} from '../hooks'
 
-type Props = {
-  scaleRatio: number
-}
-
-export default function ShowComment({scaleRatio}: Props): JSX.Element {
+export default function ShowComment(): JSX.Element {
   const {commentToShow, hideComment} = useAppState()
 
-  // useWindowListener('click', () => {
-  //   hideComment()
-  // })
-
-  useElementListener('.comment-box', 'blur', () => {
-    hideComment()
+  // detect click outside of comment box
+  useWindowListener('click', event => {
+    if (event.target instanceof HTMLElement) {
+      if (!event.target.closest('.comment-box') && commentToShow) {
+        hideComment()
+      }
+    }
   })
 
   if (!commentToShow) {
     return <span></span>
   }
 
-  console.log(scaleRatio)
-  const x = commentToShow.x * scaleRatio
-  const y = commentToShow.y * scaleRatio
-  const text = commentToShow.text
+  const {
+    coordinates: [x, y],
+    content,
+  } = commentToShow
 
   return (
-    <div className="comment-box" style={{left: `${x}px`, top: `${y}px`}}>
-      <p>{text}</p>
+    <div
+      className="comment-box"
+      style={{left: `${x + 1}px`, top: `${y + 2}px`}}
+    >
+      <p>{content}</p>
     </div>
   )
 }

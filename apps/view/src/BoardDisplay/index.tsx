@@ -15,7 +15,7 @@ const percent = (n: number): string => `${n * 100}%`
 const getId = (b: {id: string} | null): string | null => (b ? b.id : null)
 
 export default function BoardDisplay(): JSX.Element {
-  const {mode, board, loading, layerVisibility} = useAppState()
+  const {mode, board, loading, layerVisibility, resetZoom} = useAppState()
   const [displayState, setDisplayState] = useState(INITIAL_STATE)
   const prevBoard = usePrevious(board)
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -44,6 +44,10 @@ export default function BoardDisplay(): JSX.Element {
   useEffect(() => {
     if (getId(board) !== getId(prevBoard)) controllerProps.reset()
   }, [board, prevBoard])
+
+  useEffect(() => {
+    if (resetZoom) controllerProps.reset()
+  }, [resetZoom])
 
   return (
     <>

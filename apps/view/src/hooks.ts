@@ -49,9 +49,7 @@ export function useElementListener<Event extends keyof HTMLElementEventMap>(
     let el: HTMLElement | null = null
 
     if (!element) {
-      return () => {
-        console.log('no element')
-      }
+      return
     } else if (typeof element === 'string') {
       el = document.querySelector(element)
     } else {
@@ -62,5 +60,5 @@ export function useElementListener<Event extends keyof HTMLElementEventMap>(
       el.addEventListener(event, handler)
       return () => el.removeEventListener(event, handler)
     }
-  }, [element, event, handler])
+  }, [])
 }

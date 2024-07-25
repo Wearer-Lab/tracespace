@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
 import {Comment} from '../types'
-import {ContextMenu} from 'primereact/contextmenu'
 import {useAppState} from '../state'
 
 export type CommentItemProps = {
@@ -21,9 +20,7 @@ export default function CommentItem({comment}: CommentItemProps): JSX.Element {
   return (
     <li
       className={cx('dib w-100 pb3 fr', {pointer: true})}
-      onClick={() =>
-        showComment({x: comment.x, y: comment.y, text: comment.text})
-      }
+      onClick={() => showComment(comment)}
       style={{userSelect: 'none'}}
     >
       <div className={cx('relative overflow-hidden br3 shadow')}>
@@ -33,9 +30,9 @@ export default function CommentItem({comment}: CommentItemProps): JSX.Element {
               b: false,
             })}
           >
-            Comment by <span className="b">{comment.author}</span>
-            <br />
-            On {formatDate(comment.addedAt)}
+            Comment by <span className="b">{comment.user_id}</span>
+            {/* <br /> */}
+            {/* On {formatDate(comment.addedAt)} */}
           </p>
         </div>
       </div>

@@ -5,6 +5,8 @@ import {ConverterResult} from 'gerber-to-svg'
 import {Color} from 'pcb-stackup-core'
 import {ViewBox} from 'viewbox'
 import {GerberSide, GerberType} from 'whats-that-gerber'
+import {Dispatch} from './state'
+import {Point} from './BoardDisplay/types'
 
 export {CoordinateFormat, ZeroSuppression, Units, GerberType, GerberSide}
 
@@ -121,15 +123,38 @@ export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 export type Optional<T> = {[P in keyof T]?: T[P] | null | undefined}
 
+// {
+//   "board_id": "board123",
+//   "content": "This is a comment",
+//   "coordinates": [
+//     10.5,
+//     20.3
+//   ],
+//   "mode": "text",
+//   "user_id": "123e4567-e89b-12d3-a456-426614174000"
+// }
+
 export type Comment = {
   id: string
-  boardId: string
-  x: number
-  y: number
-  text: string
-  mode: Exclude<Mode, null>
-  addedAt: number
-  author: string
+  content: string
+  /** x, y, z */
+  coordinates: [number, number, number]
+  mode: Mode
+  // eslint-disable-next-line camelcase
+  user_id: string
+  // eslint-disable-next-line camelcase
+  board_id: string
+  // eslint-disable-next-line camelcase
+  product_id: string
 }
 
 export type CommentWithOutId = Omit<Comment, 'id'>
+
+export type CommentWithOutIdAndUserId = Omit<CommentWithOutId, 'user_id'>
+
+export type CommentMenuItemData = {
+  mode: Mode
+  board: BoardRender | null
+  dispatch: Dispatch
+  point: Point
+}

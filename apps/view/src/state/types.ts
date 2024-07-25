@@ -7,10 +7,11 @@ import {
   Mode,
   ErrorObject,
   Comment,
-  CommentWithOutId,
+  CommentWithOutIdAndUserId,
 } from '../types'
 
-export type CommentToShow = {x: number; y: number; text: string}
+/** [x, y, z] */
+export type CommentCoordinates = [number, number, number]
 
 export type State = {
   appPreferences: AppPreferences
@@ -23,9 +24,11 @@ export type State = {
   downloading: boolean
   layerVisibility: LayerVisibilityMap
   error: null | ErrorObject
-  commentToShow: null | CommentToShow
-  showComment: (comment: CommentToShow) => void
+  commentToShow: null | Comment
+  showComment: (comment: Comment) => void
   hideComment: () => void
+  resetZoom: boolean
+  setResetZoom: (reset: boolean) => void
 }
 
 export type Reducer = (state: State, action: Action) => State
@@ -51,7 +54,10 @@ export type Action =
   | {type: 'CREATE_BOARD_FROM_URL'; payload: string}
   | {type: 'GET_BOARD'; payload: string}
   | {type: 'GET_COMMENT'; payload: string}
-  | {type: 'ADD_COMMENT'; payload: CommentWithOutId}
+  | {
+      type: 'ADD_COMMENT'
+      payload: {comment: CommentWithOutIdAndUserId; userId: string}
+    }
   | {type: 'UPDATE_BOARD'; payload: {id: string; update: BoardUpdate}}
   | {type: 'DELETE_BOARD'; payload: string}
   | {type: 'DELETE_ALL_BOARDS'}
@@ -60,7 +66,7 @@ export type Action =
   | {type: 'TOGGLE_VISIBILITY'; payload: {id: string; solo: boolean}}
   | {type: 'BOARD_RENDERED'; payload: BoardRender; metadata: {time: number}}
   | {type: 'COMMENT_RENDERED'; payload: {comments: Array<Comment>; id: string}}
-  | {type: 'COMMENT_SHOW'; payload: CommentToShow}
+  | {type: 'COMMENT_SHOW'; payload: Comment}
   | {type: 'COMMENT_HIDE'}
   | {type: 'BOARD_UPDATED'; payload: BoardSummary}
   | {type: 'BOARD_DELETED'; payload: string}
@@ -69,3 +75,4 @@ export type Action =
   | {type: 'WORKER_INITIALIZED'; payload: Array<BoardSummary>}
   | {type: 'WORKER_ERRORED'; payload: {request: Action; error: ErrorObject}}
   | {type: 'DISMISS_ERROR'}
+  | {type: 'GET_COOKIES'; payload: Record<string, string>}

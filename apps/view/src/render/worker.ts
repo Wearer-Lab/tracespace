@@ -31,7 +31,6 @@ import {
   boardRendered,
   boardUpdated,
   commentRendered,
-  getComment as getCommentEmitter,
   CREATE_BOARD,
   CREATE_BOARD_FROM_URL,
   DELETE_ALL_BOARDS,
@@ -39,11 +38,15 @@ import {
   GET_BOARD,
   GET_BOARD_PACKAGE,
   GET_COMMENT,
+  GET_COOKIES,
+  getComment as getCommentEmitter,
+  getCookies,
   UPDATE_BOARD,
   workerErrored,
   workerInitialized,
 } from '../state'
-import {Comment, CommentWithOutId} from '../types'
+import {Comment, CommentWithOutId, CommentWithOutIdAndUserId} from '../types'
+import {downloadZipFile} from './files'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ctx: RenderWorkerContext = self as any
@@ -57,29 +60,51 @@ createBoardDatabase()
   .then(boards => ctx.postMessage(workerInitialized(boards)))
 
 const duration = (start: number): number => Date.now() - start
+let cookies: Record<string, string> = {}
 
 type SyncBoardOptions = {
   id: string
-  url: string | null
-  file: File | null
+  file: File
+}
+const getUserId = (): string | undefined => {
+  ctx.postMessage(getCookies({}))
+  return cookies.user_id
+}
+
+const COMMENT_API_HOST = 'http://localhost:9000'
+// const COMMENT_API_HOST = 'https://productflo.io/'
+
+class RequestError extends Error {
+  constructor(message: string, public status?: number) {
+    super(message)
+  }
 }
 
 const syncBoard = async (options: SyncBoardOptions): Promise<void> => {
-  const {id, url, file} = options
+  const {id, file} = options
   const formData = new FormData()
 
   formData.append('id', id)
 
-  if (url) {
-    formData.append('url', url)
-  } else if (file) {
-    formData.append('file', file)
-  }
-
   try {
-    await fetch('/api/sync', {
+    const userId = getUserId()
+
+    if (!userId) {
+      throw new RequestError('User not authenticated')
+    }
+
+    // TODO: get product name
+    const productName = 'productflo'
+
+    formData.append('user_id', userId)
+    formData.append('folder_path', `/boards/${productName}`)
+    formData.append('file', file)
+
+    const url = new URL('/api/files/', COMMENT_API_HOST)
+
+    await fetch(url, {
       method: 'POST',
-      body: formData,
+      credentials: 'include',
     })
   } catch (e) {
     console.error('syncBoard failed', e)
@@ -87,82 +112,72 @@ const syncBoard = async (options: SyncBoardOptions): Promise<void> => {
   }
 }
 
-const FAKE_COMMENTS_DB: Array<Comment> = [
-  {
-    id: '1',
-    mode: 'top',
-    text: 'This is a comment',
-    x: 0.5,
-    y: 0.5,
-    boardId: '',
-    addedAt: Date.now(),
-    author: 'Michael Chan',
-  },
-  {
-    id: '2',
-    mode: 'top',
-    text: 'This is a comment',
-    x: 0.5,
-    y: 0.5,
-    boardId: '',
-    addedAt: Date.now(),
-    author: 'Michael Chan',
-  },
-]
-
 const addComment = async (
-  comment: Comment | CommentWithOutId
+  comment: Comment | CommentWithOutId | CommentWithOutIdAndUserId,
+  userId: string
 ): Promise<Comment> => {
   try {
-    // const response = await fetch('/api/comment', {
-    //   method: 'POST',
-    //   headers: {'Content-Type': 'application/json'},
-    //   body: JSON.stringify(comment),
-    // })
+    console.log('userId', userId)
 
-    // if (!response.ok) {
-    //   throw new Error(`Could not add comment: ${response.status}`)
-    // }
-
-    // return response.json()
-    const newComment: Comment = {
-      ...comment,
-      id: Date.now().toString(),
+    if (!userId) {
+      throw new RequestError('User not authenticated')
     }
 
-    FAKE_COMMENTS_DB.push(newComment)
+    const url = new URL('/api/comments', COMMENT_API_HOST)
+    const headers = new Headers()
 
-    return newComment
+    headers.append('Content-Type', 'application/json')
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: JSON.stringify({
+        ...comment,
+        user_id: userId,
+      }),
+    })
+
+    if (!response.ok || response.status !== 201) {
+      throw new RequestError(`Could not add comment: ${response.status}`)
+    }
+
+    return response.json()
   } catch (e) {
     console.error('addComment failed', e)
-    throw new Error("Couldn't add comment to board")
+    if (e instanceof RequestError) {
+      throw e
+    }
+    throw new RequestError("Couldn't add comment to board")
   }
 }
 
 const getComment = async (boardId: string): Promise<Array<Comment>> => {
   try {
-    // TODO: Uncomment when API is ready
-    // const response = await fetch(`/api/board/${boardId}/comments/`)
+    const url = new URL(`api/comments/board/${boardId}`, COMMENT_API_HOST)
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+    })
 
-    // if (response.ok) {
-    //   const comments: Array<Comment> = await response.json()
+    if (response.ok && response.status === 200) {
+      const comments: Array<Comment> = await response.json()
 
-    //   return comments
-    // } else {
-    //   throw new Error(
-    //     `Could not fetch comments for board ${boardId}: ${response.status}`
-    //   )
-    // }
-
-    return FAKE_COMMENTS_DB
+      return comments
+    } else {
+      throw new RequestError(
+        `Could not fetch comments for board ${boardId}: ${response.status}`
+      )
+    }
   } catch (e) {
-    console.error('getComment failed', e)
-    throw new Error("Couldn't fetch comments for board")
+    if (e instanceof RequestError) {
+      throw e
+    }
+    throw new RequestError("Couldn't fetch comments for board")
   }
 }
 
 ctx.onmessage = function receive(event) {
-  console.log('received message', event.data)
   const request = event.data
   const startTime = Date.now()
   let response
@@ -196,10 +211,15 @@ ctx.onmessage = function receive(event) {
             ctx.postMessage(boardRendered(render, duration(startTime)))
 
             if (board.sourceUrl) {
-              syncBoard({
-                id: board.id,
-                url: board.sourceUrl,
-                file: null,
+              downloadZipFile(url).then(blob => {
+                const file = new File([blob], board.id + '.zip', {
+                  type: 'application/zip',
+                })
+
+                syncBoard({
+                  id: board.id,
+                  file,
+                })
               })
             }
             return saveBoard(db, board)
@@ -215,8 +235,6 @@ ctx.onmessage = function receive(event) {
     case CREATE_BOARD: {
       const files = request.payload
 
-      console.log('files', files)
-
       response = filesToStackups(files).then(async stackups => {
         const [selfContained, shared] = stackups
         const board = stackupToBoard(selfContained)
@@ -224,10 +242,17 @@ ctx.onmessage = function receive(event) {
 
         ctx.postMessage(boardRendered(render, duration(startTime)))
 
+        const file = new File(
+          [Array.isArray(files) ? files[0] : (files as File)],
+          board.id + '.zip',
+          {
+            type: 'application/zip',
+          }
+        )
+
         syncBoard({
           id: board.id,
-          url: null,
-          file: Array.isArray(files) ? files[0] : (files as File),
+          file,
         })
 
         return saveBoard(db, board).then(() =>
@@ -263,10 +288,9 @@ ctx.onmessage = function receive(event) {
     }
 
     case ADD_COMMENT: {
-      const comment = request.payload
-
-      response = addComment(comment).then(newComment =>
-        ctx.postMessage(getCommentEmitter(newComment.boardId))
+      const {comment, userId} = request.payload || {}
+      response = addComment(comment, userId).then(newComment =>
+        ctx.postMessage(getCommentEmitter(newComment.board_id))
       )
 
       break
@@ -328,6 +352,13 @@ ctx.onmessage = function receive(event) {
       response = deleteAllBoards(db).then(() =>
         ctx.postMessage(allBoardsDeleted())
       )
+      break
+    }
+
+    case GET_COOKIES: {
+      cookies = {
+        ...request.payload,
+      }
       break
     }
   }

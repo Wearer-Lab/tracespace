@@ -1,6 +1,7 @@
 import React, {useContext} from 'react'
 
-import {Store, State, Dispatch, CommentToShow} from './types'
+import {Store, State, Dispatch} from './types'
+import {Comment} from '../types'
 
 export const INITIAL_STATE: State = {
   appPreferences: {},
@@ -14,6 +15,8 @@ export const INITIAL_STATE: State = {
   layerVisibility: {},
   error: null,
   commentToShow: null,
+  resetZoom: false,
+  setResetZoom: () => 0,
   showComment: () => 0,
   hideComment: () => 0,
 }
@@ -30,11 +33,13 @@ export const useAppState = (): State & {dispatch: Dispatch} => {
   const {getState, dispatch} = useContext(StoreContext)
   const state = getState()
 
-  state.showComment = (commentToShow: CommentToShow) => {
+  state.showComment = (commentToShow: Comment) => {
+    state.resetZoom = true
     dispatch({type: 'COMMENT_SHOW', payload: commentToShow})
   }
 
   state.hideComment = () => {
+    state.resetZoom = false
     dispatch({type: 'COMMENT_HIDE'})
   }
 

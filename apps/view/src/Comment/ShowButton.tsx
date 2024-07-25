@@ -13,7 +13,9 @@ export default function ShowButton(props: Props): JSX.Element {
   return (
     <Button
       className="absolute top-7 right-1 flex items-center f5"
-      onClick={toggle}
+      onClick={() => {
+        toggle()
+      }}
     >
       <p className="dib lh-title mv0 ml3 mr2">
         {`${show ? 'Hide' : 'Show'} comments`}

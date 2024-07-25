@@ -3,6 +3,7 @@ import * as State from '../state'
 import log from '../logger'
 import RenderWorker from './worker'
 import {WorkerMessageEvent} from './types'
+import Cookies from 'js-cookie'
 
 export function createRenderMiddleware(): State.Middleware {
   const worker = new RenderWorker()
@@ -28,6 +29,13 @@ export function createRenderMiddleware(): State.Middleware {
         case State.DELETE_ALL_BOARDS: {
           log.debug('sending action to RenderWorker', action.type)
           worker.postMessage(action)
+          break
+        }
+
+        case State.GET_COOKIES: {
+          const cookies = Cookies.get()
+          console.log('cookies', cookies)
+          dispatch(State.getCookies(cookies))
           break
         }
 

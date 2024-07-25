@@ -26,7 +26,7 @@ export default function Nav(props: Props): JSX.Element {
 
   return (
     <nav className={STYLE}>
-      <PageTitle subtitle="view" className={TITLE_STYLE} />
+      <PageTitle subtitle="viewer" className={TITLE_STYLE} />
       {board && (
         <Slide in={show} from="top">
           <BoardSettings board={board} updating={updating} />

@@ -23,8 +23,6 @@ export default function CommentList(): JSX.Element {
   const haveComments = modeComments.length > 0
   const showList = haveComments && show
 
-  console.log('CommentList:', comments)
-
   return (
     <>
       <Fade in={haveComments}>

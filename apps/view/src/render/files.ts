@@ -16,15 +16,17 @@ export async function readFiles(files: Array<File>): PromiseArray<FileStream> {
 }
 
 export async function fetchZipFile(url: string): PromiseArray<FileStream> {
-  return fetch(url)
-    .then(response => {
-      if (response.ok) return response.blob()
-      throw new Error(`Could not fetch ${url}: ${response.status}`)
-    })
-    .then(blob => {
-      if (isZip(blob)) return zipReader(blob)
-      throw new Error(`${url} is not a zip file`)
-    })
+  return downloadZipFile(url).then(blob => {
+    if (isZip(blob)) return zipReader(blob)
+    throw new Error(`${url} is not a zip file`)
+  })
+}
+
+export async function downloadZipFile(url: string): Promise<Blob> {
+  return fetch(url).then(response => {
+    if (response.ok) return response.blob()
+    throw new Error(`Could not fetch ${url}: ${response.status}`)
+  })
 }
 
 export async function writeFiles(files: Array<FileToWrite>): Promise<Blob> {

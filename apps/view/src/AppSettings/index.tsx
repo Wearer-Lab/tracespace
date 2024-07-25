@@ -21,7 +21,7 @@ export default function AppSettings(props: AppSettingsProps): JSX.Element {
 
   return (
     <>
-      <a
+      {/* <a
         href={HELP_HREF}
         title={HELP_TOOLTIP}
         target="_blank"
@@ -29,7 +29,7 @@ export default function AppSettings(props: AppSettingsProps): JSX.Element {
         className={getButtonStyle({className: buttonClassName})}
       >
         <Icon name="question-circle" />
-      </a>
+      </a> */}
       <Button
         onClick={toggleOpen}
         title={SETTINGS_TOOLTIP}
@@ -38,7 +38,7 @@ export default function AppSettings(props: AppSettingsProps): JSX.Element {
         <Icon name="sliders-h" />
       </Button>
       <SettingsDrawer open={open} close={toggleOpen} />
-      <AnalyticsOptInModal />
+      {/* <AnalyticsOptInModal /> */}
     </>
   )
 }

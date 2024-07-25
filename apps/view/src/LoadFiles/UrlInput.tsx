@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Formik, Form, Field} from 'formik'
 
 import {useLocation} from '../hooks'
@@ -13,8 +13,36 @@ const BUTTON_STYLE = 'flex-none nr4 brand'
 
 const INPUT_ID = 'load-files_url-input'
 
-const defaultUrl = (loc: Location | null): string =>
-  loc ? `${loc.origin}${loc.pathname}arduino-uno.zip` : ''
+const parseUrlHash = (hash: string): URLSearchParams => {
+  hash = hash.slice(1)
+
+  return new URLSearchParams(hash)
+}
+
+const ObjToHash = (obj: Record<string, string>): string => {
+  const qString = new URLSearchParams(obj).toString()
+
+  return qString || ''
+}
+
+const defaultUrl = (loc: Location | null): {href: string; open: boolean} => {
+  const hash = loc?.hash || ''
+  const hashObj = parseUrlHash(hash)
+  const model = hashObj.get('model') || ''
+  const openModel = hashObj.get('openModel') !== 'false'
+
+  try {
+    return {
+      href: new URL(decodeURIComponent(model)).href,
+      open: Boolean(openModel),
+    }
+  } catch {
+    return {
+      href: loc ? `${loc.origin}${loc.pathname}arduino-uno.zip` : '',
+      open: false,
+    }
+  }
+}
 
 export type UrlInputProps = {
   children?: React.ReactNode
@@ -24,10 +52,22 @@ export type UrlInputProps = {
 export default function UrlInput(props: UrlInputProps): JSX.Element {
   const {children, handleUrl} = props
   const location = useLocation()
+  const url = defaultUrl(location)
+
+  useEffect(() => {
+    if (url.open) {
+      try {
+        handleUrl(url.href)
+      } finally {
+        const hash = ObjToHash({model: url.href, openModel: 'false'})
+        window.location.hash = hash
+      }
+    }
+  })
 
   return (
     <Formik
-      initialValues={{url: defaultUrl(location)}}
+      initialValues={{url: url.href}}
       onSubmit={values => handleUrl(values.url)}
       enableReinitialize
     >
